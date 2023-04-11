@@ -1,12 +1,18 @@
 import os
 import random
 import time
+import string
 from tqdm import tqdm
 
 # Define counters for each file size category
 bytes_count = 0
 kb_count = 0
 mb_count = 0
+
+#define how files of diferent size distribute by probability
+bytes_prob = 0.5
+kb_prob = 0.4
+mb_prob = 0.1
 
 # Define the total number of files to be generated
 num_files = 10000#1000000
@@ -56,10 +62,15 @@ def get_random_dir_path(root_dir, depth):
         os.makedirs(dir_path, exist_ok=True)
         return get_random_dir_path(dir_path, depth-1)
 
+# Define the function to generate a random string of characters
+def get_random_string(length):
+    letters = string.ascii_lowercase
+    return ''.join(random.choice(letters) for i in range(length))
+
 # Generate the files
 for i in tqdm(range(num_files)):
     # Generate a random file size
-    file_size = get_rand_file_sizes(0.5,0.4,0.1)
+    file_size = get_rand_file_sizes(bytes_prob, kb_prob, mb_prob)
     total_files_size += file_size
     
     # Generate a random directory path
@@ -72,7 +83,7 @@ for i in tqdm(range(num_files)):
     file_path = os.path.join(dir_path, file_name)
     
     # Generate the file content
-    file_content = os.urandom(file_size)
+    file_content = os.urandom(file_size) #get_random_string(file_size)#
     
     # Write the file
     with open(file_path, "wb") as f:
