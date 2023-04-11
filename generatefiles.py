@@ -1,5 +1,7 @@
 import os
 import random
+import time
+from tqdm import tqdm
 
 # Define counters for each file size category
 bytes_count = 0
@@ -7,21 +9,20 @@ kb_count = 0
 mb_count = 0
 
 # Define the total number of files to be generated
-num_files = 1000#1000000
+num_files = 10000#1000000
 
 # Define the total size of all files in bytes
-total_size = 100000000#1000000000000
+total_size = 500000000#1000000000000
 
 # Define the maximum number of files per directory
-max_files_per_dir = 50 #5000
+max_files_per_dir = 500 #5000
 
 # Define the maximum directory depth
 max_depth = 4
 
 total_files_size = 0
 
-# Define the list of file sizes to be randomly selected from
-#file_sizes = [1, 1024, 1048576, random.randint(1048577, 104857600)]
+start_time = time.time()
 
 def get_rand_file_sizes(bytes_prob, kb_prob, mb_prob):
     global bytes_count,kb_count,mb_count
@@ -56,9 +57,9 @@ def get_random_dir_path(root_dir, depth):
         return get_random_dir_path(dir_path, depth-1)
 
 # Generate the files
-for i in range(num_files):
+for i in tqdm(range(num_files)):
     # Generate a random file size
-    file_size = get_rand_file_sizes(0.5,0.4,0.1)#random.choice(file_sizes)
+    file_size = get_rand_file_sizes(0.5,0.4,0.1)
     total_files_size += file_size
     
     # Generate a random directory path
@@ -80,6 +81,12 @@ for i in range(num_files):
     # Check if the total size limit has been reached
     if total_files_size >= total_size:
         break
+        
+    # Output progress and estimated completion time
+    if i != 0 and i % 100 == 0:
+        progress = i / num_files * 100
+        remaining_time = (time.time() - start_time) / i * (num_files - i)
+        tqdm.write(f"Progress: {progress:.2f}%, Estimated remaining time: {remaining_time:.2f} seconds")
 # Calculate the percentage of files generated in each size category
 total_files = bytes_count + kb_count + mb_count
 bytes_percent = bytes_count / total_files * 100
