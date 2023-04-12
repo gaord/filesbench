@@ -2,8 +2,10 @@ import os
 import json
 import random
 import time
+import datetime
 import struct
 import threading
+import argparse
 
 # Define the function to read and write files
 def read_write_file(file_path):
@@ -103,25 +105,36 @@ def run_processes_concurrently(directories):
     for thread in threads:
         results.append(thread.result)
 
+    # Get the current date and time
+    now = datetime.datetime.now()
+    
+    # Format the date and time as a string
+    timestamp = now.strftime("%Y-%m-%d_%H-%M-%S")
+    
+    # Use the timestamp in the filename
+    log_filename = f"performance_log_{timestamp}.json"
+
     # Write the results to a log file in JSON format
-    with open('performance_log.json', 'w') as f:
+    with open(log_filename, 'w') as f:
         json.dump(results, f)
 
-#directories = ['/path/to/directory1', '/path/to/directory2', '/path/to/directory3']
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description='Process some integers.')
+    parser.add_argument('--working_dir', metavar='working_dir', type=str, help='the directory to process')
+    args = parser.parse_args()
 
-working_dir = './temp'
-# Get a list of all files and directories in the current directory
-files = os.listdir(working_dir)
+    # Get a list of all files and directories in the current directory
+    files = os.listdir(args.working_dir)
+    
+    # Get the relative paths of the files and directories
+    relative_paths = [os.path.join(args.working_dir, f) for f in files]
 
-# Get the relative paths of the files and directories
-relative_paths = [os.path.join(working_dir, f) for f in files]
+    # Filter out the directories
+    directories = [f for f in relative_paths if os.path.isdir(f)]
 
-# Filter out the directories
-directories = [f for f in relative_paths if os.path.isdir(f)]
+    # Select 20% of the directories at random
+    num_directories = len(directories)
+    num_to_select = int(num_directories * 0.1)
+    selected_directories = random.sample(directories, num_to_select)
 
-# Select 20% of the directories at random
-num_directories = len(directories)
-num_to_select = int(num_directories * 0.1)
-selected_directories = random.sample(directories, num_to_select)
-
-run_processes_concurrently(selected_directories)
+    run_processes_concurrently(selected_directories)
