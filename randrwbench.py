@@ -120,7 +120,8 @@ def run_processes_concurrently(directories):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Process some integers.')
-    parser.add_argument('--working_dir', metavar='working_dir', type=str, help='the directory to process')
+    parser.add_argument('--working_dir', metavar='working_dir', type=str, help='需要处理的目录')
+    parser.add_argument('--sample_rate', metavar='sample_rate', type=float, help='目录中的采样比例，取值0-1')
     args = parser.parse_args()
 
     # Get a list of all files and directories in the current directory
@@ -134,7 +135,7 @@ if __name__ == '__main__':
 
     # Select 20% of the directories at random
     num_directories = len(directories)
-    num_to_select = int(num_directories * 0.1)
+    num_to_select = int(num_directories * args.sample_rate)
     selected_directories = random.sample(directories, num_to_select)
 
     run_processes_concurrently(selected_directories)
