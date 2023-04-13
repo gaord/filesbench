@@ -11,7 +11,7 @@ import argparse
 def read_write_file(file_path):
     # Get the file name and size
     file_name = os.path.basename(file_path)
-    file_size = os.path.getsize(file_path) // 1024  # Convert to KB
+    file_size = os.path.getsize(file_path)
 
     # Read the file and record the time
     start_time = time.time()
