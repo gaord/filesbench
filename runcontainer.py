@@ -1,18 +1,15 @@
 import subprocess
 
-# Define the number of containers to create
-num_containers = 400
+# create 400 directories under /mnt
+for i in range(1, 401):
+    os.makedirs(f"/mnt/dir_{i}")
 
-# Define the command to run inside each container
-command = "mount -t ceph ceph-mon-0:/ /mnt/cephfs -o name=admin,secretfile=/etc/ceph/secret"
+# mount cephfs file system on each directory
+for i in range(1, 401):
+    os.system(f"mount -t ceph 10.209.241.165:6789:/volumes/testbench/smallfiles /mnt/dir_{i} -o secret=QVFDdWp6TmtIWCtUTkJBQVZXM2d0WHFqVEYvTXhCSmE3UnlCTlE9PQ==,name=admin")
 
-# Loop through and create the containers
-for i in range(num_containers):
-    # Define the container name
-    container_name = "client{}".format(i)
-    
-    # Define the command to create the container
-    create_command = "docker run -d --name {} myimage {}".format(container_name, command)
-    
-    # Run the command to create the container
-    subprocess.run(create_command, shell=True)
+# run specified python script on each mounted directory
+for i in range(1, 401):
+#    os.system(f"python3 randrwbench.py /mnt/dir_{i}/10f53653-b7fe-4fd3-9288-c152a0c076fb/20w50g4d")
+#异步模拟多客户端访问
+    process = subprocess.Popen(["python3", "randrwbench.py", "--working_dir", "/mnt/dir_{}/10f53653-b7fe-4fd3-9288-c152a0c076fb/20w50g4d".format(i)])
