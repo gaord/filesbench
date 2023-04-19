@@ -51,7 +51,7 @@ def get_all_files(directory):
 # Define the function to run the read/write process for a directory
 def run_process(directory):
     # Get all the files in the directory
-    files = get_all_files(directory)#[os.path.join(directory, f) for f in os.listdir(directory) if os.path.isfile(os.path.join(directory, f))]
+    files = get_all_files(directory)
 
     # Run the read/write process for each file
     results = []
@@ -121,7 +121,6 @@ def run_processes_concurrently(directories):
     # Start all the threads
     for thread in threads:
         thread.start()
-#        thread.join()
 
     # Wait for all the threads to finish
     for thread in threads:
@@ -133,16 +132,15 @@ def run_processes_concurrently(directories):
         results.append(thread.result)
     return results
 
-
-
 if __name__ == '__main__':
+    # Parse command line arguments
     parser = argparse.ArgumentParser(description='Process some integers.')
     parser.add_argument('--working_dir', metavar='working_dir', type=str, help='需要处理的目录')
     parser.add_argument('--sample_rate', metavar='sample_rate', type=float, help='目录中的采样比例，取值0-1')
     parser.add_argument('--conc', action='store_true', help='是否并发执行')    
     args = parser.parse_args()
 
-    # Get a list of all files and directories in the current directory
+    # Get a list of all files and directories in the working_dir directory
     files = os.listdir(args.working_dir)
     
     # Get the relative paths of the files and directories
@@ -151,15 +149,16 @@ if __name__ == '__main__':
     # Filter out the directories
     directories = [f for f in relative_paths if os.path.isdir(f)]
 
-    # Select 20% of the directories at random
+    # Select sample_rate of the directories at random
     num_directories = len(directories)
     num_to_select = int(num_directories * args.sample_rate)
     selected_directories = random.sample(directories, num_to_select)
 
     if args.conc:
+        # Run benchmarking concurrently
         log_it(run_processes_concurrently(selected_directories))
     else:
+        # Run benchmarking sequentially
         for directory in selected_directories:
             run_process(directory)
         log_it(threading.current_thread().result)
-        
