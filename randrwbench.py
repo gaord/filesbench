@@ -72,17 +72,43 @@ def run_process(directory):
     
     # Store the results in the thread object
     thread = threading.current_thread()
-    thread.result = {
-        'directory': directory,
-        'results': results,
-        'max_read_time': max_read_time,
-        'min_read_time': min_read_time,
-        'avg_read_time': avg_read_time,
-        'max_write_time': max_write_time,
-        'min_write_time': min_write_time,
-        'avg_write_time': avg_write_time
-    }
 
+    if thread.result is not None:
+        thread.result.append({
+	    'directory': directory,
+	    'results': results,
+	    'max_read_time': max_read_time,
+	    'min_read_time': min_read_time,
+	    'avg_read_time': avg_read_time,
+	    'max_write_time': max_write_time,
+	    'min_write_time': min_write_time,
+	    'avg_write_time': avg_write_time
+	})
+    else:
+        thread.result = {
+            'directory': directory,
+            'results': results,
+            'max_read_time': max_read_time,
+            'min_read_time': min_read_time,
+            'avg_read_time': avg_read_time,
+            'max_write_time': max_write_time,
+            'min_write_time': min_write_time,
+            'avg_write_time': avg_write_time
+        }
+
+def log_it(results):
+    # Get the current date and time
+    now = datetime.datetime.now()
+    
+    # Format the date and time as a string
+    timestamp = now.strftime("%Y-%m-%d_%H-%M-%S")
+    
+    # Use the timestamp in the filename
+    log_filename = f"performance_log_{timestamp}_{random.randint(1, 9999)}.json"
+
+    # Write the results to a log file in JSON format
+    with open(log_filename, 'w') as f:
+        json.dump(results, f)
 
 # Define the function to run the read/write process for multiple directories concurrently
 def run_processes_concurrently(directories):
@@ -95,6 +121,7 @@ def run_processes_concurrently(directories):
     # Start all the threads
     for thread in threads:
         thread.start()
+#        thread.join()
 
     # Wait for all the threads to finish
     for thread in threads:
@@ -104,24 +131,15 @@ def run_processes_concurrently(directories):
     results = []
     for thread in threads:
         results.append(thread.result)
+    return results
 
-    # Get the current date and time
-    now = datetime.datetime.now()
-    
-    # Format the date and time as a string
-    timestamp = now.strftime("%Y-%m-%d_%H-%M-%S")
-    
-    # Use the timestamp in the filename
-    log_filename = f"performance_log_{timestamp}.json"
 
-    # Write the results to a log file in JSON format
-    with open(log_filename, 'w') as f:
-        json.dump(results, f)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Process some integers.')
     parser.add_argument('--working_dir', metavar='working_dir', type=str, help='需要处理的目录')
     parser.add_argument('--sample_rate', metavar='sample_rate', type=float, help='目录中的采样比例，取值0-1')
+    parser.add_argument('--conc', action='store_true', help='是否并发执行')    
     args = parser.parse_args()
 
     # Get a list of all files and directories in the current directory
@@ -138,4 +156,10 @@ if __name__ == '__main__':
     num_to_select = int(num_directories * args.sample_rate)
     selected_directories = random.sample(directories, num_to_select)
 
-    run_processes_concurrently(selected_directories)
+    if args.conc:
+        log_it(run_processes_concurrently(selected_directories))
+    else:
+        for directory in selected_directories:
+            run_process(directory)
+        log_it(threading.current_thread().result)
+        
