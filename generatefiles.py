@@ -4,21 +4,16 @@ import time
 import string
 from tqdm import tqdm
 
-# Define counters for each file size category
-bytes_count = 0
-kb_count = 0
-mb_count = 0
-
 #define how files of diferent size distribute by probability
 bytes_prob = 0.5
-kb_prob = 0.4
-mb_prob = 0.1
+kb_prob = 0.49
+mb_prob = 0.01
 
 # Define the total number of files to be generated
 num_files = 10000#1000000
 
 # Define the total size of all files in bytes
-total_size = 500000000#1000000000000
+total_size = 107374182400 #100GB
 
 # Define the maximum number of files per directory
 max_files_per_dir = 500 #5000
@@ -26,6 +21,13 @@ max_files_per_dir = 500 #5000
 # Define the maximum directory depth
 max_depth = 4
 
+#以上设置你需要的文件数量，文件大小，文件夹深度等等
+#以下是程序执行部分，一般不用修改
+
+# Define counters for each file size category
+bytes_count = 0
+kb_count = 0
+mb_count = 0
 total_files_size = 0
 
 start_time = time.time()
@@ -92,12 +94,6 @@ for i in tqdm(range(num_files)):
     # Check if the total size limit has been reached
     if total_files_size >= total_size:
         break
-        
-    # Output progress and estimated completion time
-    if i != 0 and i % 100 == 0:
-        progress = i / num_files * 100
-        remaining_time = (time.time() - start_time) / i * (num_files - i)
-        tqdm.write(f"Progress: {progress:.2f}%, Estimated remaining time: {remaining_time:.2f} seconds")
 # Calculate the percentage of files generated in each size category
 total_files = bytes_count + kb_count + mb_count
 bytes_percent = bytes_count / total_files * 100
