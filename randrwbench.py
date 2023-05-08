@@ -73,7 +73,7 @@ def run_process(directory):
     # Store the results in the thread object
     thread = threading.current_thread()
 
-    if thread.result is not None:
+    if hasattr(thread, 'result') and thread.result is not None:
         thread.result.append({
 	    'directory': directory,
 	    'results': results,
@@ -85,7 +85,8 @@ def run_process(directory):
 	    'avg_write_time': avg_write_time
 	})
     else:
-        thread.result = {
+        thread.result = []
+        thread.result.append({
             'directory': directory,
             'results': results,
             'max_read_time': max_read_time,
@@ -94,7 +95,7 @@ def run_process(directory):
             'max_write_time': max_write_time,
             'min_write_time': min_write_time,
             'avg_write_time': avg_write_time
-        }
+        })
 
 def log_it(results):
     # Get the current date and time
@@ -134,10 +135,10 @@ def run_processes_concurrently(directories):
 
 if __name__ == '__main__':
     # Parse command line arguments
-    parser = argparse.ArgumentParser(description='Process some integers.')
+    parser = argparse.ArgumentParser(description='处理几个命令行参数')
     parser.add_argument('--working_dir', metavar='working_dir', type=str, help='需要处理的目录')
     parser.add_argument('--sample_rate', metavar='sample_rate', type=float, help='目录中的采样比例，取值0-1')
-    parser.add_argument('--conc', action='store_true', help='是否并发执行')    
+    parser.add_argument('--concurrent', action='store_true', help='是否并发执行许多目录')    
     args = parser.parse_args()
 
     # Get a list of all files and directories in the working_dir directory
