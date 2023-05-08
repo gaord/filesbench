@@ -58,6 +58,6 @@ python3 randrwbench.py --sample_rate 0.1 --working_dir /mnt/cephfs/filesbench
 ## 测试小文件的多客户端并发读写性能
 如下测试小文件的多客户端并发读写性能：
 ```
-python3 runcontainer.py
+python3 runclients.py
 ```
 
