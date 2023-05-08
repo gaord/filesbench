@@ -136,7 +136,7 @@ def run_processes_concurrently(directories):
 if __name__ == '__main__':
     # Parse command line arguments
     parser = argparse.ArgumentParser(description='处理几个命令行参数')
-    parser.add_argument('--working_dir', metavar='working_dir', type=str, help='需要处理的目录')
+    parser.add_argument('--working_dir', metavar='working_dir', type=str, help='需要处理的海量小文件目录')
     parser.add_argument('--sample_rate', metavar='sample_rate', type=float, help='目录中的采样比例，取值0-1')
     parser.add_argument('--concurrent', action='store_true', help='是否并发执行许多目录')    
     args = parser.parse_args()
